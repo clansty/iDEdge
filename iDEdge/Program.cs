@@ -15,7 +15,7 @@ namespace iDEdge
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("iDEdge 1.0");
+            Console.WriteLine("iDEdge 1.0.1");
             if (args.Length == 0)
             {
                 Console.WriteLine("用法:\n" +
@@ -92,6 +92,7 @@ namespace iDEdge
             string[] lrcLines = lrc.Split('\n');
             lrc = "[Script Info]\nTitle: Convented Sub\nScriptType: v4.00+\nWrapStyle: 0\nScaledBorderAndShadow: yes\nYCbCr Matrix: None\n\n[V4 + Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\nStyle: Default,微软雅黑,30,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,8,10,10,10,1\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n";
             TimeSpan last = TimeSpan.Zero;
+            string lastlrc = "";
             foreach (string line in lrcLines)
             {
                 if (line.Trim() == "")
@@ -100,14 +101,19 @@ namespace iDEdge
                 if (!timeMatch.Success)
                     continue;
                 Match strMatch = strReg.Match(line);
-                string title = strMatch.Success ? strMatch.Value : "";
                 TimeSpan time = TimeSpan.Parse("00:" + timeMatch.Value);
-                if (title.Trim() != "")
+                if (lastlrc.Trim() != "")
                     lrc += "Dialogue: 0," + string.Format("{0:d2}:{1:d2}:{2:d2}.{3:d2}", last.Hours, last.Minutes, last.Seconds, last.Milliseconds / 10) +
                         "," + string.Format("{0:d2}:{1:d2}:{2:d2}.{3:d2}", time.Hours, time.Minutes, time.Seconds, time.Milliseconds / 10) +
-                        ",Default,,0,0,0,," + title.Trim() + "\n";
+                        ",Default,,0,0,0,," + lastlrc.Trim() + "\n";
                 last = time;
+                lastlrc = strMatch.Success ? strMatch.Value : "";
             }
+            TimeSpan timelast = last.Add(TimeSpan.FromSeconds(10));
+            if (lastlrc.Trim() != "")
+                lrc += "Dialogue: 0," + string.Format("{0:d2}:{1:d2}:{2:d2}.{3:d2}", last.Hours, last.Minutes, last.Seconds, last.Milliseconds / 10) +
+                    "," + string.Format("{0:d2}:{1:d2}:{2:d2}.{3:d2}", timelast.Hours, timelast.Minutes, timelast.Seconds, timelast.Milliseconds / 10) +
+                    ",Default,,0,0,0,," + lastlrc.Trim() + "\n";
 
             File.WriteAllText(dir + "lrc.ass", lrc, Encoding.UTF8);
             Process merge = new Process();
