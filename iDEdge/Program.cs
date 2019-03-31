@@ -13,9 +13,10 @@ namespace iDEdge
 {
     class Program
     {
+        public const string ver = "1.0.2";
+
         static void Main(string[] args)
         {
-            const string ver = "1.0.2";
             Console.WriteLine($"iDEdge {ver}");
             if (args.Length == 0)
             {
@@ -24,6 +25,24 @@ namespace iDEdge
                 Environment.Exit(2);
             }
             string id = args[0];
+            if (id == "server")
+            {
+                string ip = "localhost";
+                if (args.Length == 2)
+                    ip = args[1];
+                Microsoft.Owin.Hosting.WebApp.Start<Startup>($"http://{ip}:9000");
+                Console.WriteLine($"API 服务已在 http://{ip}:9000 启动");
+                while (true)
+                    Console.ReadLine();
+            }
+            else
+                Environment.Exit(Make(id));
+        }
+
+        public static int Make(string id)
+        {
+            if (id == null || id == "")
+                return 1;
             string dir = Environment.GetEnvironmentVariable("temp") + "\\" + DateTime.Now.ToBinary().ToString() + "\\";
             string lrc = "";
             string name = "";
@@ -53,7 +72,7 @@ namespace iDEdge
             if (!ulong.TryParse(id, out ulong tmp))
             {
                 Console.WriteLine("解析失败");
-                Environment.Exit(3);
+                return 3;
             }
 
             string lrcaddr = $"https://api.bzqll.com/music/netease/lrc?key=579621905&id={id}";
@@ -117,8 +136,9 @@ namespace iDEdge
                 Console.WriteLine("失败");
                 File.WriteAllText(dir + "log", output);
                 Console.WriteLine($"日志已保存到 {dir}");
+                return 4;
             }
-            Environment.Exit(0);
+            return 0;
         }
 
         static string GetWebText(string url)
