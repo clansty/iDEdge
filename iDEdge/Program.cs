@@ -63,7 +63,7 @@ namespace iDEdge
             name = GetWebText(nameaddr);
             name = name.Between("\"name\":\"", "\"");
             Console.WriteLine(name);
-            webClient.DownloadFile(mp3, dir + "mp3.mp3");
+            webClient.DownloadFile(mp3, dir + "mp3");
             lrc = GetWebText(lrcaddr);
 
 
@@ -95,20 +95,32 @@ namespace iDEdge
                     "," + string.Format("{0:d2}:{1:d2}:{2:d2}.{3:d2}", timelast.Hours, timelast.Minutes, timelast.Seconds, timelast.Milliseconds / 10) +
                     ",Default,,0,0,0,," + lastlrc.Trim() + "\n";
 
-            File.WriteAllText(dir + "lrc.ass", lrc, Encoding.UTF8);
+            File.WriteAllText(dir + "lrc", lrc, Encoding.UTF8);
             Process merge = new Process();
             merge.StartInfo.CreateNoWindow = false;
             merge.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + "\\MkvMerge.exe";
             merge.StartInfo.UseShellExecute = false;
-            merge.StartInfo.Arguments = $"--ui-language zh_CN --output \"{Environment.CurrentDirectory}\\{name}.mkv\" --language 0:eng ( \"{AppDomain.CurrentDomain.BaseDirectory}\\res.pak\" ) --language 0:und ( \"{dir}\\mp3.mp3\" ) --language 0:und ( \"{dir}\\lrc.ass\" ) --track-order 0:0,1:0,2:0";
+            merge.StartInfo.Arguments = "--ui-language zh_CN " +
+                $"--output \"{Environment.CurrentDirectory}\\{name}.mkv\" " +
+                $"--language 0:eng ( \"{AppDomain.CurrentDomain.BaseDirectory}\\res.pak\" ) " +
+                $"--language 0:und ( \"{dir}mp3\" ) " +
+                $"--language 0:und ( \"{dir}lrc\" ) --track-order 0:0,1:0,2:0";
+            merge.StartInfo.RedirectStandardOutput = true;
             merge.Start();
             merge.WaitForExit();
+            string output = merge.StandardOutput.ReadToEnd();
+            merge.Close();
             if (File.Exists($"{Environment.CurrentDirectory}\\{name}.mkv"))
                 Console.WriteLine("成功");
             else
+            {
                 Console.WriteLine("失败");
+                File.WriteAllText(dir + "log", output);
+                Console.WriteLine($"日志已保存到 {dir}");
+            }
             Environment.Exit(0);
         }
+
         static string GetWebText(string url)
         {
             WebRequest request = WebRequest.Create(url);
