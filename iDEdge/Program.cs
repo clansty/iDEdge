@@ -15,11 +15,12 @@ namespace iDEdge
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("iDEdge 1.0.1");
+            const string ver = "1.0.2";
+            Console.WriteLine($"iDEdge {ver}");
             if (args.Length == 0)
             {
                 Console.WriteLine("用法:\n" +
-                    "iDEdge.exe [网易云链接|网易云音乐ID|歌名]");
+                    "iDEdge.exe [网易云链接|歌名]");
                 Environment.Exit(2);
             }
             string id = args[0];
@@ -46,14 +47,7 @@ namespace iDEdge
             {
                 Console.WriteLine("可能是歌名搜索");
                 string url = $"https://api.bzqll.com/music/netease/search?key=579621905&s={id}&type=song&limit=1&offset=0";
-                WebRequest request3 = WebRequest.Create(url);
-                WebResponse response3 = request3.GetResponse();
-                Stream datastream3 = response3.GetResponseStream();
-                StreamReader reader3 = new StreamReader(datastream3, Encoding.UTF8);
-                string r = reader3.ReadToEnd();
-                reader3.Close();
-                datastream3.Close();
-                response3.Close();
+                string r = GetWebText(url);
                 id = r.Between("\"id\":\"", "\"");
             }
             if (!ulong.TryParse(id, out ulong tmp))
@@ -66,25 +60,11 @@ namespace iDEdge
             string mp3 = $"https://api.bzqll.com/music/netease/url?key=579621905&id={id}&br=999000";
             string nameaddr = $"https://api.bzqll.com/music/netease/song?key=579621905&id={id}";
             WebClient webClient = new WebClient();
-            WebRequest request = WebRequest.Create(nameaddr);
-            WebResponse response = request.GetResponse();
-            Stream datastream = response.GetResponseStream();
-            StreamReader reader = new StreamReader(datastream, Encoding.UTF8);
-            name = reader.ReadToEnd();
-            reader.Close();
-            datastream.Close();
-            response.Close();
+            name = GetWebText(nameaddr);
             name = name.Between("\"name\":\"", "\"");
             Console.WriteLine(name);
             webClient.DownloadFile(mp3, dir + "mp3.mp3");
-            WebRequest request2 = WebRequest.Create(lrcaddr);
-            WebResponse response2 = request2.GetResponse();
-            Stream datastream2 = response2.GetResponseStream();
-            StreamReader reader2 = new StreamReader(datastream2, Encoding.UTF8);
-            lrc = reader2.ReadToEnd();
-            reader2.Close();
-            datastream2.Close();
-            response2.Close();
+            lrc = GetWebText(lrcaddr);
 
 
             Regex timeReg = new Regex(@"(?<=^\[)(\d|\:|\.)+(?=])");
@@ -92,7 +72,7 @@ namespace iDEdge
             string[] lrcLines = lrc.Split('\n');
             lrc = "[Script Info]\nTitle: Convented Sub\nScriptType: v4.00+\nWrapStyle: 0\nScaledBorderAndShadow: yes\nYCbCr Matrix: None\n\n[V4 + Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\nStyle: Default,微软雅黑,30,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,8,10,10,10,1\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n";
             TimeSpan last = TimeSpan.Zero;
-            string lastlrc = "";
+            string lastlrc = $"iDEdge {ver} 生成的室内操";
             foreach (string line in lrcLines)
             {
                 if (line.Trim() == "")
@@ -128,6 +108,18 @@ namespace iDEdge
             else
                 Console.WriteLine("失败");
             Environment.Exit(0);
+        }
+        static string GetWebText(string url)
+        {
+            WebRequest request = WebRequest.Create(url);
+            WebResponse response = request.GetResponse();
+            Stream datastream = response.GetResponseStream();
+            StreamReader reader = new StreamReader(datastream, Encoding.UTF8);
+            string result = reader.ReadToEnd();
+            reader.Close();
+            datastream.Close();
+            response.Close();
+            return result;
         }
     }
     public static class StringHelper
