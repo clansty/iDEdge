@@ -69,11 +69,8 @@ namespace iDEdge
                 string r = GetWebText(url);
                 id = r.Between("\"id\":\"", "\"");
             }
-            if (!ulong.TryParse(id, out ulong tmp))
-            {
-                Console.WriteLine("解析失败");
-                return 3;
-            }
+
+
 
             string lrcaddr = $"https://api.bzqll.com/music/netease/lrc?key=579621905&id={id}";
             string mp3 = $"https://api.bzqll.com/music/netease/url?key=579621905&id={id}&br=999000";
