@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 
 namespace iDEdge
 {
-    class Program
+    class IDEDge
     {
         public const string ver = "1.0.2";
 
@@ -25,64 +22,66 @@ namespace iDEdge
                 Environment.Exit(2);
             }
             string id = args[0];
-            if (id == "server")
-            {
-                string ip = "localhost";
-                if (args.Length == 2)
-                    ip = args[1];
-                Microsoft.Owin.Hosting.WebApp.Start<Startup>($"http://{ip}:9000");
-                Console.WriteLine($"API 服务已在 http://{ip}:9000 启动");
-                while (true)
-                    Console.ReadLine();
-            }
-            else
-                Environment.Exit(Make(id));
+            Environment.Exit(NeaseMake(id));
         }
 
-        public static int Make(string id)
+        public static int NeaseMake(string id)
         {
             if (id == null || id == "")
                 return 1;
             string dir = Environment.GetEnvironmentVariable("temp") + "\\" + DateTime.Now.ToBinary().ToString() + "\\";
-            string lrc = "";
-            string name = "";
             Directory.CreateDirectory(dir);
             if (id.IndexOf("http") > -1)
             {
                 Console.WriteLine("检测到分享链接");
-                if (id.IndexOf('?') > -1)
-                {
-                    id = id.GetRight("id=");
-                    if (id.IndexOf("&") > -1)
-                        id = id.GetLeft("&");
-                }
-                else if (id.IndexOf("/song/") > -1)
-                {
-                    id = id.GetRight("/song/");
-                    id = id.Trim('/');
-                }
+                id = NeaseUrl2Id(id);
             }
             else
             {
                 Console.WriteLine("可能是歌名搜索");
-                string url = $"https://api.bzqll.com/music/netease/search?key=579621905&s={id}&type=song&limit=1&offset=0";
-                string r = GetWebText(url);
-                id = r.Between("\"id\":\"", "\"");
+                id = NeaseName2Id(id);
             }
-
-
-
-            string lrcaddr = $"https://api.bzqll.com/music/netease/lrc?key=579621905&id={id}";
-            string mp3 = $"https://api.bzqll.com/music/netease/url?key=579621905&id={id}&br=999000";
-            string nameaddr = $"https://api.bzqll.com/music/netease/song?key=579621905&id={id}";
-            WebClient webClient = new WebClient();
-            name = GetWebText(nameaddr);
-            name = name.Between("\"name\":\"", "\"");
+            string name = NeaseId2Name(id);
             Console.WriteLine(name);
-            webClient.DownloadFile(mp3, dir + "mp3");
-            lrc = GetWebText(lrcaddr);
+            NeaseIdDownMp3(id, dir + "mp3");
+            string lrc = NeaseId2Lrc(id);
+            lrc = Lrc2Ass(lrc);
 
+            File.WriteAllText(dir + "lrc", lrc, Encoding.UTF8);
+            string output = Merge(dir, name);
+            if (File.Exists($"{Environment.CurrentDirectory}\\{name}.mkv"))
+                Console.WriteLine("成功");
+            else
+            {
+                Console.WriteLine("失败");
+                File.WriteAllText(dir + "log", output);
+                Console.WriteLine($"日志已保存到 {dir}");
+                return 4;
+            }
+            return 0;
+        }
 
+        public static string Merge(string dir, string name)
+        {
+            Process merge = new Process();
+            merge.StartInfo.CreateNoWindow = false;
+            merge.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + "\\MkvMerge.exe";
+            merge.StartInfo.UseShellExecute = false;
+            merge.StartInfo.Arguments = "--ui-language zh_CN " +
+                $"--output \"{Environment.CurrentDirectory}\\{name}.mkv\" " +
+                $"--language 0:eng ( \"{AppDomain.CurrentDomain.BaseDirectory}\\res.pak\" ) " +
+                $"--language 0:und ( \"{dir}mp3\" ) " +
+                $"--language 0:und ( \"{dir}lrc\" ) --track-order 0:0,1:0,2:0";
+            merge.StartInfo.RedirectStandardOutput = true;
+            merge.Start();
+            merge.WaitForExit();
+            string output = merge.StandardOutput.ReadToEnd();
+            merge.Close();
+            return output;
+        }
+
+        public static string Lrc2Ass(string lrc)
+        {
             Regex timeReg = new Regex(@"(?<=^\[)(\d|\:|\.)+(?=])");
             Regex strReg = new Regex(@"(?<=]).+", RegexOptions.RightToLeft);
             string[] lrcLines = lrc.Split('\n');
@@ -110,35 +109,53 @@ namespace iDEdge
                 lrc += "Dialogue: 0," + string.Format("{0:d2}:{1:d2}:{2:d2}.{3:d2}", last.Hours, last.Minutes, last.Seconds, last.Milliseconds / 10) +
                     "," + string.Format("{0:d2}:{1:d2}:{2:d2}.{3:d2}", timelast.Hours, timelast.Minutes, timelast.Seconds, timelast.Milliseconds / 10) +
                     ",Default,,0,0,0,," + lastlrc.Trim() + "\n";
-
-            File.WriteAllText(dir + "lrc", lrc, Encoding.UTF8);
-            Process merge = new Process();
-            merge.StartInfo.CreateNoWindow = false;
-            merge.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + "\\MkvMerge.exe";
-            merge.StartInfo.UseShellExecute = false;
-            merge.StartInfo.Arguments = "--ui-language zh_CN " +
-                $"--output \"{Environment.CurrentDirectory}\\{name}.mkv\" " +
-                $"--language 0:eng ( \"{AppDomain.CurrentDomain.BaseDirectory}\\res.pak\" ) " +
-                $"--language 0:und ( \"{dir}mp3\" ) " +
-                $"--language 0:und ( \"{dir}lrc\" ) --track-order 0:0,1:0,2:0";
-            merge.StartInfo.RedirectStandardOutput = true;
-            merge.Start();
-            merge.WaitForExit();
-            string output = merge.StandardOutput.ReadToEnd();
-            merge.Close();
-            if (File.Exists($"{Environment.CurrentDirectory}\\{name}.mkv"))
-                Console.WriteLine("成功");
-            else
-            {
-                Console.WriteLine("失败");
-                File.WriteAllText(dir + "log", output);
-                Console.WriteLine($"日志已保存到 {dir}");
-                return 4;
-            }
-            return 0;
+            return lrc;
         }
 
-        static string GetWebText(string url)
+        public static string NeaseId2Lrc(string id)
+        {
+            string lrcaddr = $"https://api.bzqll.com/music/netease/lrc?key=579621905&id={id}";
+            return GetWebText(lrcaddr);
+        }
+
+        public static void NeaseIdDownMp3(string id, string path)
+        {
+            string mp3 = $"https://api.bzqll.com/music/netease/url?key=579621905&id={id}&br=999000";
+            WebClient webClient = new WebClient();
+            webClient.DownloadFile(mp3, path);
+        }
+
+        public static string NeaseId2Name(string id)
+        {
+            string nameaddr = $"https://api.bzqll.com/music/netease/song?key=579621905&id={id}";
+            string name = GetWebText(nameaddr);
+            return name.Between("\"name\":\"", "\"");
+        }
+
+        public static string NeaseName2Id(string id)
+        {
+            string url = $"https://api.bzqll.com/music/netease/search?key=579621905&s={id}&type=song&limit=1&offset=0";
+            string r = GetWebText(url);
+            return r.Between("\"id\":\"", "\"");
+        }
+
+        public static string NeaseUrl2Id(string id)
+        {
+            if (id.IndexOf('?') > -1)
+            {
+                id = id.GetRight("id=");
+                if (id.IndexOf("&") > -1)
+                    id = id.GetLeft("&");
+            }
+            else if (id.IndexOf("/song/") > -1)
+            {
+                id = id.GetRight("/song/");
+                id = id.Trim('/');
+            }
+            return id;
+        }
+
+        public static string GetWebText(string url)
         {
             WebRequest request = WebRequest.Create(url);
             WebResponse response = request.GetResponse();
