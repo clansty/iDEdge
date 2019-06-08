@@ -10,7 +10,7 @@ namespace iDEdge
 {
     class IDEDge
     {
-        public const string ver = "1.0.2";
+        public const string ver = "1.1.0";
 
         static void Main(string[] args)
         {
@@ -114,29 +114,29 @@ namespace iDEdge
 
         public static string NeaseId2Lrc(string id)
         {
-            string lrcaddr = $"https://api.bzqll.com/music/netease/lrc?key=579621905&id={id}";
+            string lrcaddr = $"https://v1.itooi.cn/netease/lrc?id={id}";
             return GetWebText(lrcaddr);
         }
 
         public static void NeaseIdDownMp3(string id, string path)
         {
-            string mp3 = $"https://api.bzqll.com/music/netease/url?key=579621905&id={id}&br=999000";
+            string mp3 = $"https://v1.itooi.cn/netease/url?id={id}&quality=flac";
             WebClient webClient = new WebClient();
             webClient.DownloadFile(mp3, path);
         }
 
         public static string NeaseId2Name(string id)
         {
-            string nameaddr = $"https://api.bzqll.com/music/netease/song?key=579621905&id={id}";
+            string nameaddr = $"https://v1.itooi.cn/netease/song?id={id}";
             string name = GetWebText(nameaddr);
-            return name.Between("\"name\":\"", "\"");
+            return name.LastBetween("\"name\":\"", "\"");
         }
 
         public static string NeaseName2Id(string id)
         {
-            string url = $"https://api.bzqll.com/music/netease/search?key=579621905&s={id}&type=song&limit=1&offset=0";
+            string url = $"https://v1.itooi.cn/netease/search?keyword={id}&type=song&pageSize=1";
             string r = GetWebText(url);
-            return r.Between("\"id\":\"", "\"");
+            return r.Between("\"id\":", ",");
         }
 
         public static string NeaseUrl2Id(string id)
@@ -205,6 +205,12 @@ namespace iDEdge
         public static string Between(this string str, string leftstr, string rightstr)
         {
             int i = str.IndexOf(leftstr) + leftstr.Length;
+            string temp = str.Substring(i, str.IndexOf(rightstr, i) - i);
+            return temp;
+        }
+        public static string LastBetween(this string str, string leftstr, string rightstr)
+        {
+            int i = str.LastIndexOf(leftstr) + leftstr.Length;
             string temp = str.Substring(i, str.IndexOf(rightstr, i) - i);
             return temp;
         }
