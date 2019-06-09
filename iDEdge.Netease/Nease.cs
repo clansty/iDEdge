@@ -5,9 +5,9 @@ using System.Text;
 
 namespace iDEdge.Netease
 {
-    class Nease
+    public class Nease
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Console.WriteLine($"iDEdge {Core.ver}");
             if (args.Length == 0)
