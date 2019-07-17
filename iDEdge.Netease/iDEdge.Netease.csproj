@@ -46,5 +46,11 @@
     <Compile Include="Nease.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\iDEdge.Local\iDEdge.Local.csproj">
+      <Project>{c56905f5-7ba4-472c-bdba-fda3a413b2e7}</Project>
+      <Name>iDEdge.Local</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
