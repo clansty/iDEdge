@@ -10,13 +10,57 @@ namespace iDEdge
 {
     public class Core
     {
-        public const string ver = "1.1.1";
+        public const string ver = "1.1.2";
 
         static void Main(string[] args)
         {
-            Console.WriteLine("请运行 iDEdge.exe 或 iDEdge-音乐平台.exe");
+            switch (args.Length)
+            {
+                case 0:
+                    Console.WriteLine("参数错误\n" +
+                                      "iDEdge.Local [mp3 路径] [lrc 路径]");
+                    Environment.Exit(2);
+                    break;
+                case 1:
+                    if (File.Exists(args[0]))
+                        Environment.Exit(Local(args[0]));
+                    else
+                    {
+                        Console.WriteLine("文件不存在");
+                        Environment.Exit(1);
+                    }
+                    break;
+                case 2:
+                default:
+                    Environment.Exit(Local(args[0], args[1]));
+                    break;
+            }
         }
 
+        public static int Local(string mp3)
+        {
+            Process merge = new Process();
+            merge.StartInfo.CreateNoWindow = false;
+            merge.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + "\\MkvMerge.exe";
+            merge.StartInfo.UseShellExecute = false;
+            merge.StartInfo.Arguments = "--ui-language zh_CN " +
+                $"--output \"{mp3}.mkv\" " +
+                $"--language 0:eng ( \"{AppDomain.CurrentDomain.BaseDirectory}\\res.pak\" ) " +
+                $"--language 0:und ( \"{mp3}\" ) --track-order 0:0,1:0";
+            merge.StartInfo.RedirectStandardOutput = true;
+            merge.Start();
+            merge.WaitForExit();
+            string output = merge.StandardOutput.ReadToEnd();
+            merge.Close();
+            if (File.Exists($"{mp3}.mkv"))
+                return 0;
+            else
+                return 4;
+        }
+        public static int Local(string mp3, string lrc)
+        {
+            throw new NotImplementedException();
+        }
 
         public static string Merge(string dir, string name)
         {

@@ -7,7 +7,7 @@
     <ProjectGuid>{9BF795D9-771B-4633-B550-C42C59E5B5E0}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>iDEdge.Netease</RootNamespace>
-    <AssemblyName>iDEdge-Netease</AssemblyName>
+    <AssemblyName>iDEdge.Netease</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
