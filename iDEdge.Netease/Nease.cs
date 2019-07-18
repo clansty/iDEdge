@@ -43,6 +43,7 @@ namespace iDEdge.Netease
             lrc = Core.Lrc2Ass(lrc, $"iDEdge {Core.ver} 生成的室内操");
 
             File.WriteAllText(dir + "lrc", lrc, Encoding.UTF8);
+            name = name.Replace(":", " ").Replace("?", " ").Replace('"', ' ').Replace("/", " ").Replace("\\", " ").Replace("*", " ").Replace("<", " ").Replace(">", " ").Replace("|", " ");
             string output = Core.Merge(dir, name);
             if (File.Exists($"{Environment.CurrentDirectory}\\{name}.mkv"))
                 Console.WriteLine("成功");
