@@ -18,7 +18,7 @@ namespace iDEdge
             {
                 case 0:
                     Console.WriteLine("参数错误\n" +
-                                      "iDEdge.Local [mp3 路径] [lrc 路径]");
+                                      "iDEdge.Local [mp3 路径] [lrc 路径(可选)]");
                     Environment.Exit(2);
                     break;
                 case 1:
@@ -59,7 +59,21 @@ namespace iDEdge
         }
         public static int Local(string mp3, string lrc)
         {
-            throw new NotImplementedException();
+            string dir = Environment.GetEnvironmentVariable("temp") + "\\" + DateTime.Now.ToBinary().ToString() + "\\";
+            File.Copy(mp3, dir + "mp3");
+            lrc = Lrc2Ass(File.ReadAllText(lrc, EncodingType.GetType(lrc)), $"iDEdge {Core.ver} 生成的室内操");
+            File.WriteAllText(dir + "lrc", lrc, Encoding.UTF8);
+            string output = Core.Merge(dir, mp3);
+            if (File.Exists($"{Environment.CurrentDirectory}\\{mp3}.mkv"))
+                Console.WriteLine("成功");
+            else
+            {
+                Console.WriteLine("失败");
+                File.WriteAllText(dir + "log", output);
+                Console.WriteLine($"日志已保存到 {dir}");
+                return 4;
+            }
+            return 0;
         }
 
         public static string Merge(string dir, string name)
