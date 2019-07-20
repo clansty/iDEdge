@@ -44,8 +44,29 @@ namespace iDEdge.Netease
 
             File.WriteAllText(dir + "lrc", lrc, Encoding.UTF8);
             name = name.Replace(":", " ").Replace("?", " ").Replace('"', ' ').Replace("/", " ").Replace("\\", " ").Replace("*", " ").Replace("<", " ").Replace(">", " ").Replace("|", " ");
-            string output = Core.Merge(dir, name);
+            string output = Core.Merge(dir, name + ".mkv");
             if (File.Exists($"{Environment.CurrentDirectory}\\{name}.mkv"))
+                Console.WriteLine("成功");
+            else
+            {
+                Console.WriteLine("失败");
+                File.WriteAllText(dir + "log", output);
+                Console.WriteLine($"日志已保存到 {dir}");
+                return 4;
+            }
+            return 0;
+        }
+        public static int Make(string id, string name)
+        {
+            string dir = Environment.GetEnvironmentVariable("temp") + "\\" + DateTime.Now.ToBinary().ToString() + "\\";
+            Directory.CreateDirectory(dir);
+            IdDownMp3(id, dir + "mp3");
+            string lrc = Id2Lrc(id);
+            lrc = Core.Lrc2Ass(lrc, $"iDEdge {Core.ver} 生成的室内操");
+
+            File.WriteAllText(dir + "lrc", lrc, Encoding.UTF8);
+            string output = Core.Merge(dir, name);
+            if (File.Exists($"{name}"))
                 Console.WriteLine("成功");
             else
             {
@@ -74,6 +95,18 @@ namespace iDEdge.Netease
             string nameaddr = $"https://v1.itooi.cn/netease/song?id={id}";
             string name = Core.GetWebText(nameaddr);
             return name.LastBetween("\"name\":\"", "\"");
+        }
+        public static string Id2Singer(string id)
+        {
+            string nameaddr = $"https://v1.itooi.cn/netease/song?id={id}";
+            string name = Core.GetWebText(nameaddr);
+            return name.Between("\"ar\":[{\"name\":\"", "\"");
+        }
+        public static string Id2Album(string id)
+        {
+            string nameaddr = $"https://v1.itooi.cn/netease/song?id={id}";
+            string name = Core.GetWebText(nameaddr);
+            return name.Between("\"name\":\"", "\"");
         }
 
         public static string Name2Id(string id)

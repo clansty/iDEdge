@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace iDEdge.Wizard
 {
-    public partial class PageLocalMaking : Form
+    public partial class PageMaking : Form
     {
-        public PageLocalMaking()
+        public PageMaking()
         {
             InitializeComponent();
         }

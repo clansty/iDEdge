@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
+using iDEdge.Netease;
 
 namespace iDEdge.Wizard
 {
@@ -15,8 +16,9 @@ namespace iDEdge.Wizard
             {
                 new PageWelcome(this),
                 new PageLocal(),
-
-                new PageLocalMaking(),
+                new PageNease(),
+                new PageNeaseRes(),
+                new PageMaking(),
             };
             foreach (Form f in forms)
             {
@@ -59,6 +61,7 @@ namespace iDEdge.Wizard
             UpdateForms();
         }
 
+        string id = "";
         private void Button2_Click(object sender, EventArgs e)
         {
             switch (curr)
@@ -83,7 +86,7 @@ namespace iDEdge.Wizard
                         MessageBox.Show("文件不存在");
                         return;
                     }
-                    curr = 2;
+                    curr = 4;
                     new Thread(() =>
                     {
                         int r;
@@ -104,7 +107,58 @@ namespace iDEdge.Wizard
                             f.Dock = DockStyle.Fill;
                             curr = forms.Count - 1;
                             UpdateForms();
-                        })); // *龙门粗口*
+                        }));// *龙门粗口*
+                    }).Start();
+                    break;
+                case 2:
+                    PageNease p = (PageNease)forms[2];
+                    if (p.textBox1.Text == "")
+                    {
+                        MessageBox.Show("不能为空");
+                        return;
+                    }
+                    PageNeaseRes pnr = (PageNeaseRes)forms[3];
+                    id = p.textBox1.Text;
+                    if (id.IndexOf("http") > -1)
+                    {
+                        id = Nease.Url2Id(id);
+                    }
+                    else
+                    {
+                        id = Nease.Name2Id(id);
+                    }
+                    pnr.name.Text = Nease.Id2Name(id);
+                    pnr.pictureBox1.Load("https://v1.itooi.cn/netease/pic?id=" + id);
+                    pnr.singer.Text = Nease.Id2Singer(id);
+                    pnr.album.Text = Nease.Id2Album(id);
+                    curr = 3;
+                    break;
+                case 3:
+                    pnr = (PageNeaseRes)forms[3];
+                    if(pnr.textBox1.Text == "")
+                    {
+                        MessageBox.Show("不能为空");
+                        return;
+                    }
+                    curr = 4;
+                    new Thread(() =>
+                    {
+                        int r;
+                        Form f;
+                        r = Nease.Make(id, pnr.textBox1.Text);
+                        if (r == 0)
+                            f = new PageSucceed(pnr.textBox1.Text);
+                        else
+                            f = new PageFailed();
+                        forms.Add(f);
+                        f.TopLevel = false;
+                        panel2.Invoke(new Action(() =>
+                        {
+                            f.Parent = panel2;
+                            f.Dock = DockStyle.Fill;
+                            curr = forms.Count - 1;
+                            UpdateForms();
+                        }));// *龙门粗口*
                     }).Start();
                     break;
             }

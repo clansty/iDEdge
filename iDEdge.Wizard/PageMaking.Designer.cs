@@ -1,6 +1,6 @@
 ﻿namespace iDEdge.Wizard
 {
-    partial class PageLocalMaking
+    partial class PageMaking
     {
         /// <summary>
         /// Required designer variable.

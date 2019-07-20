@@ -64,11 +64,23 @@
     <Compile Include="PageLocal.Designer.cs">
       <DependentUpon>PageLocal.cs</DependentUpon>
     </Compile>
-    <Compile Include="PageLocalMaking.cs">
+    <Compile Include="PageMaking.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PageLocalMaking.Designer.cs">
-      <DependentUpon>PageLocalMaking.cs</DependentUpon>
+    <Compile Include="PageMaking.Designer.cs">
+      <DependentUpon>PageMaking.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PageNease.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PageNease.Designer.cs">
+      <DependentUpon>PageNease.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PageNeaseRes.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PageNeaseRes.Designer.cs">
+      <DependentUpon>PageNeaseRes.cs</DependentUpon>
     </Compile>
     <Compile Include="PageSucceed.cs">
       <SubType>Form</SubType>
@@ -94,8 +106,14 @@
     <EmbeddedResource Include="PageLocal.resx">
       <DependentUpon>PageLocal.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PageLocalMaking.resx">
-      <DependentUpon>PageLocalMaking.cs</DependentUpon>
+    <EmbeddedResource Include="PageMaking.resx">
+      <DependentUpon>PageMaking.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PageNease.resx">
+      <DependentUpon>PageNease.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PageNeaseRes.resx">
+      <DependentUpon>PageNeaseRes.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PageSucceed.resx">
       <DependentUpon>PageSucceed.cs</DependentUpon>
@@ -111,6 +129,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">
@@ -128,6 +147,13 @@
       <Project>{c56905f5-7ba4-472c-bdba-fda3a413b2e7}</Project>
       <Name>iDEdge.Local</Name>
     </ProjectReference>
+    <ProjectReference Include="..\iDEdge.Netease\iDEdge.Netease.csproj">
+      <Project>{9bf795d9-771b-4633-b550-c42c59e5b5e0}</Project>
+      <Name>iDEdge.Netease</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cover.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
