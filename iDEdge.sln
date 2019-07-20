@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iDEdge", "iDEdge\iDEdge.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iDEdge.Local", "iDEdge.Local\iDEdge.Local.csproj", "{C56905F5-7BA4-472C-BDBA-FDA3A413B2E7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iDEdge.Wizard", "iDEdge.Wizard\iDEdge.Wizard.csproj", "{AC21583D-F93B-4FC1-99A3-131403BCF274}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{C56905F5-7BA4-472C-BDBA-FDA3A413B2E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C56905F5-7BA4-472C-BDBA-FDA3A413B2E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C56905F5-7BA4-472C-BDBA-FDA3A413B2E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC21583D-F93B-4FC1-99A3-131403BCF274}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC21583D-F93B-4FC1-99A3-131403BCF274}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC21583D-F93B-4FC1-99A3-131403BCF274}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC21583D-F93B-4FC1-99A3-131403BCF274}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

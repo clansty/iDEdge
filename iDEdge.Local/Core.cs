@@ -40,7 +40,7 @@ namespace iDEdge
         public static int Local(string mp3)
         {
             Process merge = new Process();
-            merge.StartInfo.CreateNoWindow = false;
+            merge.StartInfo.CreateNoWindow = true;
             merge.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + "\\MkvMerge.exe";
             merge.StartInfo.UseShellExecute = false;
             merge.StartInfo.Arguments = "--ui-language zh_CN " +
