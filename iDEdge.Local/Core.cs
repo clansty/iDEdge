@@ -60,11 +60,12 @@ namespace iDEdge
         public static int Local(string mp3, string lrc)
         {
             string dir = Environment.GetEnvironmentVariable("temp") + "\\" + DateTime.Now.ToBinary().ToString() + "\\";
+            Directory.CreateDirectory(dir);
             File.Copy(mp3, dir + "mp3");
             lrc = Lrc2Ass(File.ReadAllText(lrc, EncodingType.GetType(lrc)), $"iDEdge {Core.ver} 生成的室内操");
             File.WriteAllText(dir + "lrc", lrc, Encoding.UTF8);
             string output = Core.Merge(dir, mp3);
-            if (File.Exists($"{Environment.CurrentDirectory}\\{mp3}.mkv"))
+            if (File.Exists($"{mp3}.mkv"))
                 Console.WriteLine("成功");
             else
             {
@@ -79,11 +80,11 @@ namespace iDEdge
         public static string Merge(string dir, string name)
         {
             Process merge = new Process();
-            merge.StartInfo.CreateNoWindow = false;
+            merge.StartInfo.CreateNoWindow = true;
             merge.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + "\\MkvMerge.exe";
             merge.StartInfo.UseShellExecute = false;
             merge.StartInfo.Arguments = "--ui-language zh_CN " +
-                $"--output \"{Environment.CurrentDirectory}\\{name}.mkv\" " +
+                $"--output \"{name}.mkv\" " +
                 $"--language 0:eng ( \"{AppDomain.CurrentDomain.BaseDirectory}\\res.pak\" ) " +
                 $"--language 0:und ( \"{dir}mp3\" ) " +
                 $"--language 0:und ( \"{dir}lrc\" ) --track-order 0:0,1:0,2:0";
