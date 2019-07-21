@@ -10,7 +10,7 @@ namespace iDEdge
 {
     public class Core
     {
-        public const string ver = "1.1.2";
+        public const string ver = "1.2.0";
 
         static void Main(string[] args)
         {
@@ -41,11 +41,11 @@ namespace iDEdge
         {
             Process merge = new Process();
             merge.StartInfo.CreateNoWindow = true;
-            merge.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + "\\MkvMerge.exe";
+            merge.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + "\\iDEdge.Merge.exe";
             merge.StartInfo.UseShellExecute = false;
             merge.StartInfo.Arguments = "--ui-language zh_CN " +
                 $"--output \"{mp3}.mkv\" " +
-                $"--language 0:eng ( \"{AppDomain.CurrentDomain.BaseDirectory}\\res.pak\" ) " +
+                $"--language 0:eng ( \"{AppDomain.CurrentDomain.BaseDirectory}\\iDEdge.Resources\" ) " +
                 $"--language 0:und ( \"{mp3}\" ) --track-order 0:0,1:0";
             merge.StartInfo.RedirectStandardOutput = true;
             merge.Start();
@@ -81,11 +81,11 @@ namespace iDEdge
         {
             Process merge = new Process();
             merge.StartInfo.CreateNoWindow = true;
-            merge.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + "\\MkvMerge.exe";
+            merge.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + "\\iDEdge.Merge.exe";
             merge.StartInfo.UseShellExecute = false;
             merge.StartInfo.Arguments = "--ui-language zh_CN " +
                 $"--output \"{name}\" " +
-                $"--language 0:eng ( \"{AppDomain.CurrentDomain.BaseDirectory}\\res.pak\" ) " +
+                $"--language 0:eng ( \"{AppDomain.CurrentDomain.BaseDirectory}\\iDEdge.Resources\" ) " +
                 $"--language 0:und ( \"{dir}mp3\" ) " +
                 $"--language 0:und ( \"{dir}lrc\" ) --track-order 0:0,1:0,2:0";
             merge.StartInfo.RedirectStandardOutput = true;

@@ -51,14 +51,14 @@
     <Compile Include="StringHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="mkvmerge.exe">
+    <None Include="iDEdge.Merge.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res.pak">
+    <EmbeddedResource Include="iDEdge.Resources">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

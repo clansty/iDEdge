@@ -63,9 +63,39 @@ namespace iDEdge.Wizard.Properties {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap cover {
+        internal static System.Drawing.Bitmap qq {
             get {
-                object obj = ResourceManager.GetObject("cover", resourceCulture);
+                object obj = ResourceManager.GetObject("qq", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap temp_qrcode_share_646751705 {
+            get {
+                object obj = ResourceManager.GetObject("temp_qrcode_share_646751705", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap vx {
+            get {
+                object obj = ResourceManager.GetObject("vx", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap zfb {
+            get {
+                object obj = ResourceManager.GetObject("zfb", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

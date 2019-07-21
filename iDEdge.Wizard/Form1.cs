@@ -1,9 +1,9 @@
-﻿using System;
+﻿using iDEdge.Netease;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
-using iDEdge.Netease;
 
 namespace iDEdge.Wizard
 {
@@ -12,6 +12,7 @@ namespace iDEdge.Wizard
         public Form1()
         {
             InitializeComponent();
+            linkLabel1.Text = Core.ver;
             forms = new List<Form>()
             {
                 new PageWelcome(this),
@@ -26,7 +27,7 @@ namespace iDEdge.Wizard
                 f.Parent = panel2;
                 f.Dock = DockStyle.Fill;
             }
-            UpdateForms();
+            SetPage(0, false, true);
         }
 
         public int plantform = -2;
@@ -34,8 +35,9 @@ namespace iDEdge.Wizard
         int curr = 0;
         List<Form> forms;
 
-        private void UpdateForms()
+        private void SetPage(int p, bool btn1, bool btn2)
         {
+            curr = p;
             for (int i = 0; i < forms.Count; i++)
             {
                 if (i == curr)
@@ -43,22 +45,22 @@ namespace iDEdge.Wizard
                 else
                     forms[i].Hide();
             }
-            button1.Enabled = true;
-            button2.Enabled = true;
-            if (curr == 0)
-            {
-                button1.Enabled = false;
-            }
-            if (curr == forms.Count - 1)
-            {
-                button2.Enabled = false;
-            }
+            button1.Enabled = btn1;
+            button2.Enabled = btn2;
         }
 
         private void Button1_Click(object sender, EventArgs e)
         {
-            curr = 0;
-            UpdateForms();
+            if (curr == 5)
+            {
+                button1.Text = "上一步";
+                forms[5].Dispose();
+                forms.RemoveAt(5);
+            }
+            if (curr == 3)
+                SetPage(2, true, true);
+            else
+                SetPage(0, false, true);
         }
 
         string id = "";
@@ -72,7 +74,7 @@ namespace iDEdge.Wizard
                         MessageBox.Show("请选择音乐平台");
                         return;
                     }
-                    curr = plantform;
+                    SetPage(plantform, true, true);
                     break;
                 case 1:
                     PageLocal pg = (PageLocal)forms[1];
@@ -86,7 +88,7 @@ namespace iDEdge.Wizard
                         MessageBox.Show("文件不存在");
                         return;
                     }
-                    curr = 4;
+                    SetPage(4, false, false);
                     new Thread(() =>
                     {
                         int r;
@@ -105,8 +107,8 @@ namespace iDEdge.Wizard
                         {
                             f.Parent = panel2;
                             f.Dock = DockStyle.Fill;
-                            curr = forms.Count - 1;
-                            UpdateForms();
+                            button1.Text = "重新开始";
+                            SetPage(5, true, false);
                         }));// *龙门粗口*
                     }).Start();
                     break;
@@ -131,16 +133,17 @@ namespace iDEdge.Wizard
                     pnr.pictureBox1.Load("https://v1.itooi.cn/netease/pic?id=" + id);
                     pnr.singer.Text = Nease.Id2Singer(id);
                     pnr.album.Text = Nease.Id2Album(id);
-                    curr = 3;
+                    pnr.textBox1.Text = "";
+                    SetPage(3, true, true);
                     break;
                 case 3:
                     pnr = (PageNeaseRes)forms[3];
-                    if(pnr.textBox1.Text == "")
+                    if (pnr.textBox1.Text == "")
                     {
                         MessageBox.Show("不能为空");
                         return;
                     }
-                    curr = 4;
+                    SetPage(4, false, false);
                     new Thread(() =>
                     {
                         int r;
@@ -156,13 +159,17 @@ namespace iDEdge.Wizard
                         {
                             f.Parent = panel2;
                             f.Dock = DockStyle.Fill;
-                            curr = forms.Count - 1;
-                            UpdateForms();
+                            button1.Text = "重新开始";
+                            SetPage(5, true, false);
                         }));// *龙门粗口*
                     }).Start();
                     break;
             }
-            UpdateForms();
+        }
+
+        private void LinkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            new AboutBox1().Show();
         }
     }
 }
