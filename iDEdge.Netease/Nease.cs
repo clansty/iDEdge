@@ -40,9 +40,11 @@ namespace iDEdge.Netease
                 Console.WriteLine("可能是歌名搜索");
                 id = Name2Id(id);
             }
-            string name = Id2Name(id);
+            var jobj = Id2JObj(id);
+            var name = JObj2Name(jobj);
             Console.WriteLine(name);
-            Console.WriteLine(Id2Singer(id));
+            Console.WriteLine(JObj2Singer(jobj));
+            Console.WriteLine(JObj2Album(jobj));
             IdDownMp3(id, dir + "mp3");
             string lrc = Id2Lrc(id);
             lrc = Core.Lrc2Ass(lrc, $"iDEdge {Core.ver} 生成的室内操");
@@ -95,7 +97,6 @@ namespace iDEdge.Netease
             api.Dispose();
             return res;
         }
-
         public static void IdDownMp3(string id, string path)
         {
             CloudMusicApi api = new CloudMusicApi();
@@ -110,8 +111,7 @@ namespace iDEdge.Netease
             WebClient webClient = new WebClient();
             webClient.DownloadFile(mp3, path);
         }
-
-        public static string Id2Name(string id)
+        public static JObject Id2JObj(string id)
         {
             CloudMusicApi api = new CloudMusicApi();
             api.Request(CloudMusicApiProviders.SongDetail,
@@ -120,41 +120,22 @@ namespace iDEdge.Netease
                     ["ids"] = id
                 },
                 out JObject obj);
-            var res = obj["songs"][0].Value<string>("name");
             api.Dispose();
-            return res;
+            return obj;
         }
-        public static string Id2Singer(string id)
+        public static string JObj2Name(JObject obj) => obj["songs"][0].Value<string>("name");
+        public static string JObj2Singer(JObject obj)
         {
-            CloudMusicApi api = new CloudMusicApi();
-            api.Request(CloudMusicApiProviders.SongDetail,
-                new Dictionary<string, string>()
-                {
-                    ["ids"] = id,
-                },
-                out JObject obj);
             string res = "";
-            foreach(var i in obj["songs"][0]["ar"])
+            foreach (var i in obj["songs"][0]["ar"])
             { //适配多个歌手
                 res += i.Value<string>("name") + "/";
             }
             res = res.TrimEnd('/');
-            api.Dispose();
             return res;
         }
-        public static string Id2Album(string id)
-        {
-            CloudMusicApi api = new CloudMusicApi();
-            api.Request(CloudMusicApiProviders.SongDetail,
-                new Dictionary<string, string>()
-                {
-                    ["ids"] = id,
-                },
-                out JObject obj);
-            var res = obj["songs"][0]["album"][0].Value<string>("name");
-            api.Dispose();
-            return res;
-        }
+        public static string JObj2Album(JObject obj) => obj["songs"][0]["al"].Value<string>("name");
+        public static string JObj2Pic(JObject obj) => obj["songs"][0]["al"].Value<string>("picUrl");
 
         public static string Name2Id(string id)
         {
