@@ -10,7 +10,7 @@ namespace iDEdge
 {
     public class Core
     {
-        public const string ver = "1.2.0";
+        public const string ver = "1.2.1";
 
         static void Main(string[] args)
         {
