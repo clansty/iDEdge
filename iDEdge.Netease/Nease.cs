@@ -1,4 +1,7 @@
-﻿using System;
+﻿using NeteaseCloudMusicApi;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -26,6 +29,7 @@ namespace iDEdge.Netease
                 return 1;
             string dir = Environment.GetEnvironmentVariable("temp") + "\\" + DateTime.Now.ToBinary().ToString() + "\\";
             Directory.CreateDirectory(dir);
+            CloudMusicApi api = new CloudMusicApi();
             if (id.IndexOf("http") > -1)
             {
                 Console.WriteLine("检测到分享链接");
@@ -38,6 +42,7 @@ namespace iDEdge.Netease
             }
             string name = Id2Name(id);
             Console.WriteLine(name);
+            Console.WriteLine(Id2Singer(id));
             IdDownMp3(id, dir + "mp3");
             string lrc = Id2Lrc(id);
             lrc = Core.Lrc2Ass(lrc, $"iDEdge {Core.ver} 生成的室内操");
@@ -79,41 +84,91 @@ namespace iDEdge.Netease
         }
         public static string Id2Lrc(string id)
         {
-            string lrcaddr = $"https://v1.itooi.cn/netease/lrc?id={id}";
-            return Core.GetWebText(lrcaddr);
+            CloudMusicApi api = new CloudMusicApi();
+            api.Request(CloudMusicApiProviders.Lyric,
+                new Dictionary<string, string>()
+                {
+                    ["id"] = id
+                },
+                out JObject obj);
+            var res = obj["lrc"].Value<string>("lyric");
+            api.Dispose();
+            return res;
         }
 
         public static void IdDownMp3(string id, string path)
         {
-            string mp3 = $"https://v1.itooi.cn/netease/url?id={id}&quality=flac";
+            CloudMusicApi api = new CloudMusicApi();
+            api.Request(CloudMusicApiProviders.SongUrl,
+                new Dictionary<string, string>()
+                {
+                    ["id"] = id
+                },
+                out JObject obj);
+            var mp3 = obj["data"][0].Value<string>("url");
+            api.Dispose();
             WebClient webClient = new WebClient();
             webClient.DownloadFile(mp3, path);
         }
 
         public static string Id2Name(string id)
         {
-            string nameaddr = $"https://v1.itooi.cn/netease/song?id={id}";
-            string name = Core.GetWebText(nameaddr);
-            return name.LastBetween("\"name\":\"", "\"");
+            CloudMusicApi api = new CloudMusicApi();
+            api.Request(CloudMusicApiProviders.SongDetail,
+                new Dictionary<string, string>()
+                {
+                    ["ids"] = id
+                },
+                out JObject obj);
+            var res = obj["songs"][0].Value<string>("name");
+            api.Dispose();
+            return res;
         }
         public static string Id2Singer(string id)
         {
-            string nameaddr = $"https://v1.itooi.cn/netease/song?id={id}";
-            string name = Core.GetWebText(nameaddr);
-            return name.Between("\"ar\":[{\"name\":\"", "\"");
+            CloudMusicApi api = new CloudMusicApi();
+            api.Request(CloudMusicApiProviders.SongDetail,
+                new Dictionary<string, string>()
+                {
+                    ["ids"] = id,
+                },
+                out JObject obj);
+            string res = "";
+            foreach(var i in obj["songs"][0]["ar"])
+            { //适配多个歌手
+                res += i.Value<string>("name") + "/";
+            }
+            res = res.TrimEnd('/');
+            api.Dispose();
+            return res;
         }
         public static string Id2Album(string id)
         {
-            string nameaddr = $"https://v1.itooi.cn/netease/song?id={id}";
-            string name = Core.GetWebText(nameaddr);
-            return name.Between("\"name\":\"", "\"");
+            CloudMusicApi api = new CloudMusicApi();
+            api.Request(CloudMusicApiProviders.SongDetail,
+                new Dictionary<string, string>()
+                {
+                    ["ids"] = id,
+                },
+                out JObject obj);
+            var res = obj["songs"][0]["album"][0].Value<string>("name");
+            api.Dispose();
+            return res;
         }
 
         public static string Name2Id(string id)
         {
-            string url = $"https://v1.itooi.cn/netease/search?keyword={id}&type=song&pageSize=1";
-            string r = Core.GetWebText(url);
-            return r.Between("\"id\":", ",");
+            CloudMusicApi api = new CloudMusicApi();
+            api.Request(CloudMusicApiProviders.Search,
+                new Dictionary<string, string>()
+                {
+                    ["keywords"] = id,
+                    ["limit"] = "1"
+                },
+                out JObject obj);
+            id = obj["result"]["songs"][0].Value<int>("id").ToString();
+            api.Dispose();
+            return id;
         }
 
         public static string Url2Id(string id)
