@@ -64,7 +64,7 @@ namespace iDEdge.Wizard
         }
 
         string id = "";
-        private void Button2_Click(object sender, EventArgs e)
+        private async void Button2_Click(object sender, EventArgs e)
         {
             switch (curr)
             {
@@ -127,12 +127,13 @@ namespace iDEdge.Wizard
                     }
                     else
                     {
-                        id = Nease.Name2Id(id);
+                        id = await Nease.Name2IdAsync(id);
                     }
-                    pnr.name.Text = Nease.Id2Name(id);
-                    pnr.pictureBox1.Load("https://v1.itooi.cn/netease/pic?id=" + id);
-                    pnr.singer.Text = Nease.Id2Singer(id);
-                    pnr.album.Text = Nease.Id2Album(id);
+                    var jobj = await Nease.Id2JObjAsync(id);
+                    pnr.name.Text = Nease.JObj2Name(jobj);
+                    pnr.pictureBox1.LoadAsync(Nease.JObj2Pic(jobj));
+                    pnr.singer.Text = Nease.JObj2Singer(jobj);
+                    pnr.album.Text = Nease.JObj2Album(jobj);
                     pnr.textBox1.Text = "";
                     SetPage(3, true, true);
                     break;

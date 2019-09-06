@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace iDEdge.Netease
 {
@@ -123,6 +124,17 @@ namespace iDEdge.Netease
             api.Dispose();
             return obj;
         }
+        public static async Task<JObject> Id2JObjAsync(string id)
+        {
+            CloudMusicApi api = new CloudMusicApi();
+            (_, var obj) = await api.RequestAsync(CloudMusicApiProviders.SongDetail,
+                new Dictionary<string, string>()
+                {
+                    ["ids"] = id
+                });
+            api.Dispose();
+            return obj;
+        }
         public static string JObj2Name(JObject obj) => obj["songs"][0].Value<string>("name");
         public static string JObj2Singer(JObject obj)
         {
@@ -147,6 +159,19 @@ namespace iDEdge.Netease
                     ["limit"] = "1"
                 },
                 out JObject obj);
+            id = obj["result"]["songs"][0].Value<int>("id").ToString();
+            api.Dispose();
+            return id;
+        }
+        public static async Task<string> Name2IdAsync(string id)
+        {
+            CloudMusicApi api = new CloudMusicApi();
+            (_, var obj) = await api.RequestAsync(CloudMusicApiProviders.Search,
+                new Dictionary<string, string>()
+                {
+                    ["keywords"] = id,
+                    ["limit"] = "1"
+                });
             id = obj["result"]["songs"][0].Value<int>("id").ToString();
             api.Dispose();
             return id;
